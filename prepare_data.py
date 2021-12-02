@@ -3,12 +3,6 @@ import numpy as np
 import textstat
 import spacy
 
-# read in dataset and drop unnecessary columns
-training_data = pd.read_csv('data/train.csv')
-training_data.drop(columns=['url_legal', 'license'], inplace=True)
-testing_data = pd.read_csv('data/test.csv')
-testing_data.drop(columns=['url_legal', 'license'], inplace=True)
-
 # Feature engineering found at https://www.kaggle.com/pdan93/clrp-features-only-model
 nlp = spacy.load('en_core_web_sm')
 
@@ -124,7 +118,32 @@ def add_df_features(df):
         df.loc[idx, 'word_incidence_pron'] = word_incidence(row['excerpt'], 'PRON', doc)
         df.loc[idx, 'word_incidence_verb'] = word_incidence(row['excerpt'], 'VERB', doc)
 
-add_df_features(training_data)
-add_df_features(testing_data)
-print(training_data.head())
-print(testing_data.head())
+def get_data():
+    # read in dataset
+    training_data = pd.read_csv('data/train.csv')
+    #training_data.drop(columns=['id', 'excerpt', 'url_legal', 'license'], inplace=True)
+    testing_data = pd.read_csv('data/test.csv')
+    #testing_data.drop(columns=['id', 'url_legal', 'license'], inplace=True)
+
+    # add the CLRP features
+    add_df_features(training_data)
+    add_df_features(testing_data)
+
+    # drop unnecessary columns
+    training_data.drop(columns=['id', 'excerpt', 'url_legal', 'license'], inplace=True)
+    testing_data.drop(columns=['id', 'url_legal', 'license'], inplace=True)
+
+    # read in the pre-calculated features and drop unnecessary columns
+    cleanedFeatures = pd.read_csv('cleanedfeatures.csv')
+    cleanedFeatures.drop(columns=['Unnamed: 0'], inplace=True)
+
+    # concatenate the dataframes
+    training_data = pd.concat([training_data, cleanedFeatures], axis=1)
+
+    print(training_data.dtypes)
+
+    y_train = training_data[["target"]].to_numpy()
+    training_data.drop(columns=['target'], inplace=True)
+    X_train = training_data.to_numpy()
+
+    return X_train, y_train
