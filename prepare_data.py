@@ -140,7 +140,8 @@ def get_data():
     # concatenate the dataframes
     training_data = pd.concat([training_data, cleanedFeatures], axis=1)
 
-    print(training_data.dtypes)
+    # normalize the data along the columns
+    training_data = (training_data - training_data.min())/(training_data.max() - training_data.min())
 
     y_train = training_data[["target"]].to_numpy()
     training_data.drop(columns=['target'], inplace=True)
