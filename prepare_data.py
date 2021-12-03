@@ -118,7 +118,7 @@ def add_df_features(df):
         df.loc[idx, 'word_incidence_pron'] = word_incidence(row['excerpt'], 'PRON', doc)
         df.loc[idx, 'word_incidence_verb'] = word_incidence(row['excerpt'], 'VERB', doc)
 
-def get_data():
+def get_feature_data():
     # read in dataset
     training_data = pd.read_csv('data/train.csv')
     #training_data.drop(columns=['id', 'excerpt', 'url_legal', 'license'], inplace=True)
@@ -146,5 +146,20 @@ def get_data():
     y_train = training_data[["target"]].to_numpy()
     training_data.drop(columns=['target'], inplace=True)
     X_train = training_data.to_numpy()
+
+    return X_train, y_train
+
+def get_excerpt_data():
+    # read in dataset and drop unnecessary columns
+    training_data = pd.read_csv('data/train.csv')
+    #training_data.drop(columns=['id', 'excerpt', 'url_legal', 'license'], inplace=True)
+    testing_data = pd.read_csv('data/test.csv')
+    #testing_data.drop(columns=['id', 'url_legal', 'license'], inplace=True)
+
+    # normalize the target data
+    training_data["target"] = (training_data["target"] - training_data["target"].min())/(training_data["target"].max() - training_data["target"].min())
+
+    X_train = training_data[["excerpt"]].to_numpy()
+    y_train = training_data[["target"]].to_numpy()
 
     return X_train, y_train
