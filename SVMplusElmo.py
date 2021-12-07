@@ -98,6 +98,8 @@ def svmelmo():
             
         print("mean rmse",np.mean(scores))
         mean_scores.append(np.mean(scores))
-        return np.array(preds)/nfolds
+        #return np.array(preds)/nfolds
+        return np.mean(scores)
     
-    preds1 = get_preds(train_embedding,target,test_embedding)
+    #preds1 = get_preds(train_embedding,target,test_embedding)
+    return get_preds(train_embedding,target,test_embedding)
