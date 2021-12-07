@@ -140,6 +140,7 @@ def get_feature_data():
     # concatenate the dataframes
     training_data = pd.concat([training_data, cleanedFeatures], axis=1)
 
+
     # normalize the data along the columns
     training_data = (training_data - training_data.min())/(training_data.max() - training_data.min())
 
