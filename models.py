@@ -17,8 +17,8 @@ from sklearn.model_selection import train_test_split
 from prepare_data import get_feature_data, get_excerpt_data
 from visualize import plot_loss
 
-vocab_size = 10000
-max_length = 100
+VOCAB_SIZE = 10000
+MAX_LENGTH = 100
 
 def root_mean_squared_error(y_true, y_pred):
     return K.sqrt(K.mean(K.square(y_pred - y_true)))
@@ -85,7 +85,7 @@ def train_features_only():
     # return the best RMSE score on the validation set
     return np.amin(history.history['val_root_mean_squared_error'])
 
-def train_excerpts(vocab_size, max_length):
+def train_excerpts():
     print('\n--- Reading data...')
     X, y = get_excerpt_data()
     print(f'X shape: {X.shape}')
@@ -93,16 +93,16 @@ def train_excerpts(vocab_size, max_length):
 
     # integer encode the documents
     X = np.squeeze(X)
-    X = [one_hot(d, vocab_size) for d in X]
+    X = [one_hot(d, VOCAB_SIZE) for d in X]
 
     # pad documents to a max length
-    X = pad_sequences(X, maxlen=max_length, padding='post')
+    X = pad_sequences(X, maxlen=MAX_LENGTH, padding='post')
 
     # split into training and testing data
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 
     print('\n--- Creating model...')
-    model = get_excerpt_model(vocab_size, max_length)
+    model = get_excerpt_model(VOCAB_SIZE, MAX_LENGTH)
 
     history = model.fit(
             X_train,
@@ -122,16 +122,16 @@ def train_rnn():
 
     # integer encode the documents
     X = np.squeeze(X)
-    X = [one_hot(d, vocab_size) for d in X]
+    X = [one_hot(d, VOCAB_SIZE) for d in X]
 
     # pad documents to a max length
-    X = pad_sequences(X, maxlen=max_length, padding='post')
+    X = pad_sequences(X, maxlen=MAX_LENGTH, padding='post')
 
     # split into training and testing data
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 
     print('\n--- Creating model...')
-    model = get_rnn_model(vocab_size, max_length)
+    model = get_rnn_model(VOCAB_SIZE, MAX_LENGTH)
 
     history = model.fit(
             X_train,
@@ -145,6 +145,6 @@ def train_rnn():
 
 
 #train_features_only()
-#train_excerpts(vocab_size, max_length)
+#train_excerpts()
 #train_rnn()
 

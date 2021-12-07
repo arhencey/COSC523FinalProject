@@ -1,3 +1,9 @@
+# This file reads in the data from the csv file and returns either the excerpts
+# and their targets or performs feature engineering and returns those features
+# and their targets.
+#
+# Author: Alan Hencey
+
 import pandas as pd
 import numpy as np
 import textstat
