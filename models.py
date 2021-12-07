@@ -1,4 +1,6 @@
-# This file implements the neural network models to be trained on the dataset
+# This file implements the neural network models to be trained on the dataset.
+#
+# Author: Alan Hencey
 
 import numpy as np
 import pandas as pd
@@ -14,6 +16,9 @@ from sklearn.model_selection import train_test_split
 
 from prepare_data import get_feature_data, get_excerpt_data
 from visualize import plot_loss
+
+vocab_size = 10000
+max_length = 100
 
 def root_mean_squared_error(y_true, y_pred):
     return K.sqrt(K.mean(K.square(y_pred - y_true)))
@@ -35,7 +40,6 @@ def get_excerpt_model(vocab_size, max_length):
     model = Sequential()
     model.add(Embedding(vocab_size, 32, input_length=max_length))
     model.add(Flatten())
-    #model.add(SimpleRNN(256))
     model.add(Dense(128, activation='relu'))
     model.add(Dropout(0.6))
     model.add(Dense(64, activation='relu'))
@@ -48,9 +52,9 @@ def get_excerpt_model(vocab_size, max_length):
 def get_rnn_model(vocab_size, max_length):
     model = Sequential()
     model.add(Embedding(vocab_size, 32, input_length=max_length, name='embedding_layer'))
-    model.add(SimpleRNN(256))
-    model.add(Dense(64, activation='relu'))
-    model.add(Dropout(0.6))
+    model.add(SimpleRNN(128))
+    model.add(Dense(32, activation='relu'))
+    model.add(Dropout(0.5))
     model.add(Dense(1, activation='sigmoid'))
 
     model.compile(Adam(learning_rate=0.001), loss='mse', metrics=[root_mean_squared_error])
@@ -78,7 +82,8 @@ def train_features_only():
             shuffle=True,
             epochs=25,
     )
-    return history
+    # return the best RMSE score on the validation set
+    return np.amin(history.history['val_root_mean_squared_error'])
 
 def train_excerpts(vocab_size, max_length):
     print('\n--- Reading data...')
@@ -106,7 +111,8 @@ def train_excerpts(vocab_size, max_length):
             shuffle=True,
             epochs=25,
     )
-    return history
+    # return the best RMSE score on the validation set
+    return np.amin(history.history['val_root_mean_squared_error'])
 
 def train_rnn():
     print('\n--- Reading data...')
@@ -134,11 +140,11 @@ def train_rnn():
             shuffle=True,
             epochs=25,
     )
-    return history
+    # return the best RMSE score on the validation set
+    return np.amin(history.history['val_root_mean_squared_error'])
 
-vocab_size = 10000
-max_length = 100
-#plot_loss(train_features_only())
-#plot_loss(train_excerpts(vocab_size, max_length))
-plot_loss(train_rnn())
+
+#train_features_only()
+#train_excerpts(vocab_size, max_length)
+#train_rnn()
 
